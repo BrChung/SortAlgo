@@ -1,11 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.button-container{
+  flex-grow: 1;
+}
+
+
 .array-container {
-  position: absolute;
-  left: 100px;
+  display: flex;
+  height: 500px;
+  margin: 5%;
+  align-items: flex-end;
   /* top: 100px; */
 }
 
 .array-bar {
-  width: 2px;
+  width: 800px;
   display: inline-block;
-  margin: 0 1px;
+  margin: 0px 0px;
+}
+
+.menuButton {
+}
+
+.grow {
+  text-align: left;
+  flex-grow: 1;
+}
+
+.bottomAppBar{
+  bottom: 0;
+}
+
+.Info{
+  flex-grow: 1;
 }
