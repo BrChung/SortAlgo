@@ -4,7 +4,25 @@
   justify-content: space-around;
 }
 
-.button-container{
+.prop-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3%;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.slider-container {
+  flex-grow: 10;
+  margin-right: 3%;
+}
+
+.array-type{
+  flex-grow: 1;
+}
+
+.sort-button{
   flex-grow: 1;
 }
 
@@ -23,9 +41,6 @@
   margin: 0px 0px;
 }
 
-.menuButton {
-}
-
 .grow {
   text-align: left;
   flex-grow: 1;
@@ -37,4 +52,8 @@
 
 .Info{
   flex-grow: 1;
+}
+
+.drawer-list{
+  width: 200px;
 }

@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import SettingsIcon from '@material-ui/icons/Settings';
-import SortIcon from '@material-ui/icons/Sort';
+
 import Slider from '@material-ui/core/Slider';
 import clsx from 'clsx';
 import List from '@material-ui/core/List';
@@ -18,6 +18,21 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Link from '@material-ui/core/Link';
+
+
+//Icons
+import SortIcon from '@material-ui/icons/Sort';
+import BubbleChartIcon from '@material-ui/icons/BubbleChart';
+import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+import SelectAllIcon from '@material-ui/icons/SelectAll';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
+import MergeTypeIcon from '@material-ui/icons/MergeType';
+import CallSplitIcon from '@material-ui/icons/CallSplit';
+import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
+
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
@@ -53,6 +68,7 @@ export default class SortingVisualizer extends React.Component {
       arraySorting: false,
       anchorEl: null,
       drawerOpen: false,
+      selectedIndex: 0,
     };
   }
 
@@ -72,8 +88,7 @@ export default class SortingVisualizer extends React.Component {
     }
     const speed = (-4 / 150) * (arraySize-50) + 5;
     this.setState({ array });
-    this.setState({ arraySorted: false });
-    this.setState({ sortingSpeed: speed });
+    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 0 });
   }
 
   reverseArray() {
@@ -87,8 +102,7 @@ export default class SortingVisualizer extends React.Component {
     }
     const speed = (-4 / 150) * (arraySize-50) + 5
     this.setState({ array });
-    this.setState({ arraySorted: false });
-    this.setState({ sortingSpeed: speed })
+    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 1 });
   }
 
   mergeSort() {
@@ -260,9 +274,34 @@ export default class SortingVisualizer extends React.Component {
   updateArrayValue = (event, newValue) => {
     if(newValue !== this.state.arraySize){
       this.setState({ arraySize: newValue });
-      this.resetArray()
+      if(this.state.selectedIndex === 0){
+        this.resetArray();
+      }
+      else{
+        this.reverseArray();
+      }
     }
   };
+
+  handleMenuItemClick = (event, index) => {
+    this.setState({ selectedIndex: index, anchorEl: null });
+    if(index === 0){
+      this.resetArray();
+    }
+    else{
+      this.reverseArray();
+    }
+  };
+
+  handleClickListItem = (event) => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleClose = (event, input) => {
+    this.setState({ anchorEl: input });
+  };
+
+  
 
   toggleDrawer(newValue){
     this.setState( { drawerOpen: newValue } );
@@ -273,72 +312,92 @@ export default class SortingVisualizer extends React.Component {
     const disabled_sorted = this.state.arraySorted;
     const disabled_sorting = this.state.arraySorting;
     const drawerOpen = this.state.drawerOpen;
+    const anchorEl = this.state.anchorEl;
+    const selectedIndex = this.state.selectedIndex;
+    const options = [
+      'Random',
+      'Reverse',
+    ];
 
     return (
       <div className="container">
         <AppBar position="sticky">
           <Toolbar>
-            <IconButton edge="start" className="menuButton" color="inherit" aria-label="menu">
-              <MenuIcon />
+            <IconButton edge="start" className="sortButton" color="inherit" aria-label="sort" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
+              <SortIcon />
             </IconButton>
             <Typography variant="h6" className="grow">
-              SortAlgo
+              <Link href="https://sortalgo.com" color="inherit" underline="none">
+                SortAlgo
+              </Link>
             </Typography>
-            <Button
-              color="inherit"
-              onClick={() => this.resetArray()}
-              disabled={disabled_sorting}
-              >Random Array
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => this.reverseArray()}
-              disabled={disabled_sorting}
-              >Reverse Array
-          </Button>
+            <IconButton edge="end" className="moreButton" color="inherit" aria-label="more" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
+              <MoreIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
-        <div className="button-container">
-          <Button onClick={() => this.mergeSort()}
-            disabled={disabled_sorted}
-            >Merge Sort
+        <div className="prop-container">
+          <div className="slider-container">
+          <Typography id="array-size-slider" gutterBottom>
+            Array Size
+            </Typography>
+            <Slider
+              value={this.state.arraySize}
+              onChange={this.updateArrayValue}
+              disabled={disabled_sorting}
+              defaultValue={100}
+              getAriaValueText={valuetext}
+              aria-labelledby="array-size-slider"
+              valueLabelDisplay="auto"
+              step={10}
+              marks
+              min={50}
+              max={200}
+            />
+          </div>
+          <div className="array-type">
+            <List component="nav" aria-label="array type">
+              <ListItem
+                button
+                aria-haspopup="true"
+                aria-controls="array-type-menu"
+                aria-label="array type"
+                onClick={event => {this.handleClickListItem(event)}}
+                disabled={disabled_sorting}
+              >
+                <ListItemText primary="Array Type:" secondary={options[selectedIndex]} />
+              </ListItem>
+            </List>
+            <Menu
+              id="array-type-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={event => {this.handleClose(event, null)}}
+            >
+              {options.map((option, index) => (
+                <MenuItem
+                  key={option}
+                  selected={index === selectedIndex}
+                  onClick={event => this.handleMenuItemClick(event, index)}
+                >
+                  {option}
+                </MenuItem>
+              ))}
+            </Menu>
+          </div>
+          <div className="sort-button">
+            <Button
+              onClick={() => {this.toggleDrawer(true)}}
+              disabled={disabled_sorting}
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<SortIcon />}
+            >
+              Sort
             </Button>
-          <Button onClick={() => this.quickSort()}
-            disabled={disabled_sorted}
-            >Quick Sort
-            </Button>
-          <Button onClick={() => this.heapSort()}
-            disabled={disabled_sorted}
-            >Heap Sort
-            </Button>
-          <Button onClick={() => this.selectionSort()}
-            disabled={disabled_sorted}
-            >Selection Sort
-            </Button>
-          <Button onClick={() => this.insertionSort()}
-            disabled={disabled_sorted}
-            >Insertion Sort
-            </Button>
-          <Button onClick={() => this.bubbleSort()}
-            disabled={disabled_sorted}
-            >Bubble Sort
-            </Button>
-          <Typography id="discrete-slider" gutterBottom>
-            Size
-          </Typography>
-          <Slider
-            value={this.state.arraySize}
-            onChange={this.updateArrayValue}
-            disabled={disabled_sorting}
-            defaultValue={100}
-            getAriaValueText={valuetext}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            step={10}
-            marks
-            min={50}
-            max={200}
-          />
+          </div>
         </div>
         <div className="array-container">
           {array.map((value, idx) => (
@@ -355,15 +414,69 @@ export default class SortingVisualizer extends React.Component {
         <div className="Info">
             <p>sdfsdfsdfsdfdsfsdf</p>
         </div>
-        <Button onClick={() => {this.toggleDrawer(true)}}>Test</Button>
           <Drawer anchor='left' open={drawerOpen} onClose={() => {this.toggleDrawer(false)}}>
-            <div className="drawerList">
-              <List component="nav" aria-label="side nav bar">
+            <div className="drawer-list">
+              <List component="nav" aria-label="sort-algo-side-nav-bar"
+                subheader={
+                  <ListSubheader component="div" id="sort-algo-subheader">
+                    Sorting Algorithms
+                  </ListSubheader>
+                }>
                 <ListItem button onClick={() => this.mergeSort()} disabled={disabled_sorted}>
                   <ListItemIcon>
-                    <SortIcon />
+                    <MergeTypeIcon />
                   </ListItemIcon>
                   <ListItemText primary="Merge Sort" />
+                </ListItem>
+                <ListItem button onClick={() => this.quickSort()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <CallSplitIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Quick Sort" />
+                </ListItem>
+                <ListItem button onClick={() => this.heapSort()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <AccountTreeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Heap Sort" />
+                </ListItem>
+                <ListItem button onClick={() => this.selectionSort()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <SelectAllIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Selection Sort" />
+                </ListItem>
+                <ListItem button onClick={() => this.insertionSort()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <ViewCarouselIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Insertion Sort" />
+                </ListItem>
+                <ListItem button onClick={() => this.bubbleSort()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <BubbleChartIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Bubble Sort" />
+                </ListItem>
+              </List>
+              <Divider />
+              <List component="nav" aria-label="generate-array-side-nav-bar"
+                subheader={
+                  <ListSubheader component="div" id="sort-algo-subheader">
+                    Generate New Array
+                  </ListSubheader>
+                }>
+                <ListItem button onClick={() => this.resetArray()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <AutorenewIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Random Array" />
+                </ListItem>
+                <ListItem button onClick={() => this.reverseArray()} disabled={disabled_sorted}>
+                  <ListItemIcon>
+                    <CompareArrowsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Reverse Array" />
                 </ListItem>
               </List>
             </div>
