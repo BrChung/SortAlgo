@@ -6,13 +6,10 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import SettingsIcon from '@material-ui/icons/Settings';
+
 
 import Slider from '@material-ui/core/Slider';
-import clsx from 'clsx';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
@@ -20,6 +17,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Link from '@material-ui/core/Link';
+
 
 
 //Icons
@@ -32,9 +30,8 @@ import MergeTypeIcon from '@material-ui/icons/MergeType';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
+import MoreIcon from '@material-ui/icons/MoreVert';
 
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 
 
 import {getMergeSortAnimations} from '../sortingAlgorithms/mergeSort';
@@ -307,6 +304,7 @@ export default class SortingVisualizer extends React.Component {
     this.setState( { drawerOpen: newValue } );
   };
 
+
   render() {
     const {array} = this.state;
     const disabled_sorted = this.state.arraySorted;
@@ -318,6 +316,7 @@ export default class SortingVisualizer extends React.Component {
       'Random',
       'Reverse',
     ];
+    
 
     return (
       <div className="container">
