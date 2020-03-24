@@ -1,3 +1,6 @@
+//Components
+import Footer from './Components/Footer';
+
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -20,6 +23,7 @@ import Link from '@material-ui/core/Link';
 
 
 
+
 //Icons
 import SortIcon from '@material-ui/icons/Sort';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
@@ -30,7 +34,7 @@ import MergeTypeIcon from '@material-ui/icons/MergeType';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
-import MoreIcon from '@material-ui/icons/MoreVert';
+import GitHubIcon from '@material-ui/icons/GitHub';
 
 
 
@@ -49,9 +53,7 @@ const BAR_DEFAULT_COLOR = 'lightblue';
 const SECONDARY_COLOR = 'red';
 
 
-function valuetext(value) {
-  return `${value}`;
-}
+
 
 export default class SortingVisualizer extends React.Component {
   constructor(props) {
@@ -66,11 +68,25 @@ export default class SortingVisualizer extends React.Component {
       anchorEl: null,
       drawerOpen: false,
       selectedIndex: 0,
+      stars: 0,
+      forks: 0,
     };
+
   }
 
   componentDidMount() {
     this.resetArray();
+    fetch('https://api.github.com/repos/brchung/sorting-visualizer')
+      .then(res => res.json())
+      .then(
+        (result) => {
+          const { stargazers_count, forks_count } = result;
+          this.setState({ stars: stargazers_count, forks: forks_count});
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
   }
 
   sortButtonEvent(){
@@ -89,15 +105,11 @@ export default class SortingVisualizer extends React.Component {
   }
 
   reverseArray() {
-    const array = [];
+    let array = [];
+    this.setState({ array });
     const arraySize = this.state.arraySize;
-    let pushValue = 495;
-    const step = pushValue / arraySize;
-    for (let i = 0; i < arraySize; i++) {
-      array.push(Math.floor(pushValue + 5));
-      pushValue = pushValue - step;
-    }
-    const speed = (-4 / 150) * (arraySize-50) + 5
+    array = reversePushValues(5, 495, arraySize);
+    const speed = (-4 / 150) * (arraySize-50) + 5;
     this.setState({ array });
     this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 1 });
   }
@@ -298,11 +310,20 @@ export default class SortingVisualizer extends React.Component {
     this.setState({ anchorEl: input });
   };
 
-  
-
   toggleDrawer(newValue){
     this.setState( { drawerOpen: newValue } );
   };
+
+  getButtonSize(isDesktop){
+    if(isDesktop){
+      return "large"
+    }
+    else{
+      return "small"
+    }
+  }
+
+
 
 
   render() {
@@ -331,7 +352,7 @@ export default class SortingVisualizer extends React.Component {
               </Link>
             </Typography>
             <IconButton edge="end" className="moreButton" color="inherit" aria-label="more" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
-              <MoreIcon />
+              <GitHubIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -378,6 +399,7 @@ export default class SortingVisualizer extends React.Component {
                 <MenuItem
                   key={option}
                   selected={index === selectedIndex}
+                  disabled={index === 1 && disabled_sorted}
                   onClick={event => this.handleMenuItemClick(event, index)}
                 >
                   {option}
@@ -391,7 +413,7 @@ export default class SortingVisualizer extends React.Component {
               disabled={disabled_sorting}
               variant="contained"
               color="primary"
-              size="large"
+              size={this.getButtonSize(this.props.isDesktop)}
               startIcon={<SortIcon />}
             >
               Sort
@@ -410,82 +432,97 @@ export default class SortingVisualizer extends React.Component {
             </div>
           ))}
         </div>
-        <div className="Info">
-            <p>sdfsdfsdfsdfdsfsdf</p>
-        </div>
-          <Drawer anchor='left' open={drawerOpen} onClose={() => {this.toggleDrawer(false)}}>
-            <div className="drawer-list">
-              <List component="nav" aria-label="sort-algo-side-nav-bar"
-                subheader={
-                  <ListSubheader component="div" id="sort-algo-subheader">
-                    Sorting Algorithms
-                  </ListSubheader>
-                }>
-                <ListItem button onClick={() => this.mergeSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <MergeTypeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Merge Sort" />
-                </ListItem>
-                <ListItem button onClick={() => this.quickSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <CallSplitIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Quick Sort" />
-                </ListItem>
-                <ListItem button onClick={() => this.heapSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <AccountTreeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Heap Sort" />
-                </ListItem>
-                <ListItem button onClick={() => this.selectionSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <SelectAllIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Selection Sort" />
-                </ListItem>
-                <ListItem button onClick={() => this.insertionSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <ViewCarouselIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Insertion Sort" />
-                </ListItem>
-                <ListItem button onClick={() => this.bubbleSort()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <BubbleChartIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Bubble Sort" />
-                </ListItem>
-              </List>
-              <Divider />
-              <List component="nav" aria-label="generate-array-side-nav-bar"
-                subheader={
-                  <ListSubheader component="div" id="sort-algo-subheader">
-                    Generate New Array
-                  </ListSubheader>
-                }>
-                <ListItem button onClick={() => this.resetArray()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <AutorenewIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Random Array" />
-                </ListItem>
-                <ListItem button onClick={() => this.reverseArray()} disabled={disabled_sorted}>
-                  <ListItemIcon>
-                    <CompareArrowsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Reverse Array" />
-                </ListItem>
-              </List>
-            </div>
-          </Drawer>
+        <Footer />
+        <Drawer anchor='left' open={drawerOpen} onClose={() => {this.toggleDrawer(false)}}>
+          <div className="drawer-list">
+            <List component="nav" aria-label="sort-algo-side-nav-bar"
+              subheader={
+                <ListSubheader component="div" id="sort-algo-subheader">
+                  Sorting Algorithms
+                </ListSubheader>
+              }>
+              <ListItem button onClick={() => this.mergeSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <MergeTypeIcon />
+                </ListItemIcon>
+                <ListItemText primary="Merge Sort" />
+              </ListItem>
+              <ListItem button onClick={() => this.quickSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <CallSplitIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quick Sort" />
+              </ListItem>
+              <ListItem button onClick={() => this.heapSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <AccountTreeIcon />
+                </ListItemIcon>
+                <ListItemText primary="Heap Sort" />
+              </ListItem>
+              <ListItem button onClick={() => this.selectionSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <SelectAllIcon />
+                </ListItemIcon>
+                <ListItemText primary="Selection Sort" />
+              </ListItem>
+              <ListItem button onClick={() => this.insertionSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <ViewCarouselIcon />
+                </ListItemIcon>
+                <ListItemText primary="Insertion Sort" />
+              </ListItem>
+              <ListItem button onClick={() => this.bubbleSort()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <BubbleChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Bubble Sort" />
+              </ListItem>
+            </List>
+            <Divider />
+            <List component="nav" aria-label="generate-array-side-nav-bar"
+              subheader={
+                <ListSubheader component="div" id="sort-algo-subheader">
+                  Generate New Array
+                </ListSubheader>
+              }>
+              <ListItem button onClick={() => this.resetArray()} disabled={disabled_sorting}>
+                <ListItemIcon>
+                  <AutorenewIcon />
+                </ListItemIcon>
+                <ListItemText primary="Random Array" />
+              </ListItem>
+              <ListItem button onClick={() => this.reverseArray()} disabled={disabled_sorted}>
+                <ListItemIcon>
+                  <CompareArrowsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reverse Array" />
+              </ListItem>
+            </List>
+          </div>
+        </Drawer>
       </div>
     );
   }
 }
 
+//Returns a random integer from interval
 function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+//Returns an array with decreasing value
+function reversePushValues(min, max, arraySize) {
+  const array = [];
+  let pushValue = max;
+  const step = max / arraySize;
+  for (let i = 0; i < arraySize; i++) {
+    array.push(Math.floor(pushValue + min));
+    pushValue = pushValue - step;
+  }
+  return array.slice();
+}
+
+//Returns text as valuetext string
+function valuetext(value) {
+  return `${value}`;
+}
