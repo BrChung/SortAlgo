@@ -1,4 +1,4 @@
-.container {
+.root-container {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -18,7 +18,7 @@
   margin-right: 3%;
 }
 
-.array-type{
+.array-type-menu{
   flex-grow: 1;
 }
 
@@ -26,31 +26,12 @@
   flex-grow: 1;
 }
 
-
-.array-container {
-  display: flex;
-  height: 500px;
-  margin: 5%;
-  align-items: flex-end;
-  /* top: 100px; */
-}
-
-.array-bar {
-  width: 800px;
-  display: inline-block;
-  margin: 0px 0px;
-}
-
-.grow {
-  text-align: left;
+.github-button{
   flex-grow: 1;
 }
 
-.bottomAppBar{
-  bottom: 0;
-}
-
-.Info{
+.top-navbar {
+  text-align: left;
   flex-grow: 1;
 }
 

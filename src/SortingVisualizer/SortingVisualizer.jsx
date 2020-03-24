@@ -1,7 +1,6 @@
-//Components
-import Footer from './Components/Footer';
-
 import React from 'react';
+
+//Material UI Imports
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -10,8 +9,6 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
-
-
 import Slider from '@material-ui/core/Slider';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -21,10 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Link from '@material-ui/core/Link';
 
-
-
-
-//Icons
+//Material UI Icons
 import SortIcon from '@material-ui/icons/Sort';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
@@ -36,253 +30,108 @@ import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import GitHubIcon from '@material-ui/icons/GitHub';
 
-
-
-import {getMergeSortAnimations} from '../sortingAlgorithms/mergeSort';
-import {getQuickSortAnimations} from '../sortingAlgorithms/quickSort';
-import {getHeapSortAnimations} from '../sortingAlgorithms/heapSort';
-import {getBubbleSortAnimations} from '../sortingAlgorithms/bubbleSort';
-import {getSelectionSortAnimations} from '../sortingAlgorithms/selectionSort';
-import {getInsertionSortAnimations} from '../sortingAlgorithms/insertionSort';
+//Components
+import Footer from './Components/Footer';
+import ArrayBars from './Components/ArrayBars';
 import './SortingVisualizer.css';
 
-// This is the main color of the array bars.
-const BAR_DEFAULT_COLOR = 'lightblue';
-
-// This is the color of array bars that are being compared throughout the animations.
-const SECONDARY_COLOR = 'red';
-
-
-
+//Returns text as valuetext string
+function valuetext(value) {
+  return `${value}`;
+}
 
 export default class SortingVisualizer extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      array: [],
-      arraySize: 100,
-      sortingSpeed: 1,
-      arraySorted: false,
-      arraySorting: false,
-      anchorEl: null,
-      drawerOpen: false,
-      selectedIndex: 0,
-      stars: 0,
-      forks: 0,
+      arraySorted: false,   //True if array is sorted
+      arraySorting: false,  //True if array is currently being sorted
+      drawerOpen: false,    //True if side drawer is open
+      anchorEl: null,       //Anchor element for menu to select array type
+      selectedIndex: 0,     //Index of selected option (0 - Array Type: Random, 1 - Array Type: Reverse)
+      arraySize: 100,       //Array size to be sorted
+      sortingSpeed: 1,      //Array sorting animation speed, default = 1 millisecond
     };
 
+    //Create a reference to ArrayBars
+    this.arrayBars = React.createRef();
+
+    //Bind the this context to the finished sorting handler function
+    this.finishedSortingHandler = this.finishedSortingHandler.bind(this);
+
   }
 
-  componentDidMount() {
-    this.resetArray();
-    fetch('https://api.github.com/repos/brchung/sorting-visualizer')
-      .then(res => res.json())
-      .then(
-        (result) => {
-          const { stargazers_count, forks_count } = result;
-          this.setState({ stars: stargazers_count, forks: forks_count});
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+  //Nothing to Mount here
+  componentDidMount() {}
+
+  //---- Functions that alter array state (Reference ArrayBars.jsx) -----//
+  
+  //Reset the array to random values
+  resetArray = () => {
+    this.arrayBars.current.resetArray();
+    const arraySize = this.state.arraySize;
+    const speed = (-4 / 150) * (arraySize-50) + 5;
+    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 0 });
   }
 
+  //Set array with reverse values
+  reverseArray = () => {
+    this.arrayBars.current.reverseArray();
+    const arraySize = this.state.arraySize;
+    const speed = (-4 / 150) * (arraySize-50) + 5;
+    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 1 });
+  }
+
+  //Do merge sort
+  doMergeSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.mergeSort();
+  }
+
+  //Do quick sort
+  doQuickSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.quickSort();
+  }
+
+  //Do heap sort
+  doHeapSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.heapSort();
+  }
+
+  //Do selection sort
+  doSelectionSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.selectionSort();
+  }
+
+  //Do insertion sort
+  doInsertionSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.insertionSort();
+  }
+
+  //Do bubble sort
+  doBubbleSort = () =>{
+    this.sortButtonEvent();
+    this.arrayBars.current.bubbleSort();
+  }
+
+  //----- State Handlers -----//
+
+  //A sorting algorithm was just ran, therefore we must change state (also close drawer so user can see sorting proccess)
   sortButtonEvent(){
     this.setState({ arraySorted: true, arraySorting: true, drawerOpen: false });
   }
 
-  resetArray() {
-    const array = [];
-    const arraySize = this.state.arraySize;
-    for (let i = 0; i < arraySize; i++) {
-      array.push(randomIntFromInterval(5, 500));
-    }
-    const speed = (-4 / 150) * (arraySize-50) + 5;
-    this.setState({ array });
-    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 0 });
-  }
-
-  reverseArray() {
-    let array = [];
-    this.setState({ array });
-    const arraySize = this.state.arraySize;
-    array = reversePushValues(5, 495, arraySize);
-    const speed = (-4 / 150) * (arraySize-50) + 5;
-    this.setState({ array });
-    this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 1 });
-  }
-
-  mergeSort() {
-    this.sortButtonEvent();
-    const auxiliaryArray = this.state.array.slice();
-    const animations = getMergeSortAnimations(auxiliaryArray);
-    for (let i = 0, len = animations.length; i < len; i++) {
-      const arrayBars = document.getElementsByClassName('array-bar');
-      const isColorChange = i % 3 !== 2;
-      if (isColorChange) {
-        const [barOneIdx, barTwoIdx] = animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color = i % 3 === 0 ? SECONDARY_COLOR : BAR_DEFAULT_COLOR;
-        setTimeout(() => {
-          barOneStyle.backgroundColor = color;
-          barTwoStyle.backgroundColor = color;
-        }, i * this.state.sortingSpeed);
-      } else {
-        setTimeout(() => {
-          const [barOneIdx, newHeight] = animations[i];
-          const barOneStyle = arrayBars[barOneIdx].style;
-          barOneStyle.height = `${newHeight}px`;
-          if(i + 1 === len){
-            this.setState({ arraySorting: false });
-          }
-        }, i * this.state.sortingSpeed);
-      }
-    }
-  }
-
-  quickSort() {
-    this.sortButtonEvent();
-    const animations = getQuickSortAnimations(this.state.array);
-    for (let i = 0, len = animations.length; i < len; i++) {
-      const arrayBars=document.getElementsByClassName('array-bar');
-      const isColorChange=animations[i][2];
-      if(isColorChange){
-        const[barOneIdx,barTwoIdx]= animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color=i%2===0?SECONDARY_COLOR:BAR_DEFAULT_COLOR;
-        setTimeout(()=>{
-          barOneStyle.backgroundColor=color;
-          barTwoStyle.backgroundColor=color;
-        },i*this.state.sortingSpeed);
-       }else{
-        setTimeout(()=>{
-          const [barOneIdx,newHeight]=animations[i];
-          const barOneStyle=arrayBars[barOneIdx].style;
-          barOneStyle.height=`${newHeight}px`;
-          if(i + 1 === len){
-            this.setState({ arraySorting: false });
-          }
-        },i*this.state.sortingSpeed);
-      }
-    }
-  }
-
-  heapSort() {
-    this.sortButtonEvent();
-    const animations = getHeapSortAnimations(this.state.array);
-    for (let i = 0, len = animations.length; i < len; i++) {
-      const arrayBars=document.getElementsByClassName('array-bar');
-      const isColorChange=animations[i][2];
-      if(isColorChange){
-        const[barOneIdx,barTwoIdx]= animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color=i%2===0?SECONDARY_COLOR:BAR_DEFAULT_COLOR;
-        setTimeout(()=>{
-          barOneStyle.backgroundColor=color;
-          barTwoStyle.backgroundColor=color;
-        },i*this.state.sortingSpeed);
-       }else{
-        setTimeout(()=>{
-          const [barOneIdx,newHeight]=animations[i];
-          const barOneStyle=arrayBars[barOneIdx].style;
-          barOneStyle.height=`${newHeight}px`;
-          if(i + 1 === len){
-            this.setState({ arraySorting: false });
-          }
-        },i*this.state.sortingSpeed);
-      }
-    }
-  }
-
-  bubbleSort() {
-    this.sortButtonEvent();
-    const animations=getBubbleSortAnimations(this.state.array);
-    for (let i = 0, len = animations.length; i < len; i++) {
-      const arrayBars=document.getElementsByClassName('array-bar');
-      const isColorChange=animations[i][2];
-      if(isColorChange){
-        const[barOneIdx,barTwoIdx]= animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color=i%2===0?SECONDARY_COLOR:BAR_DEFAULT_COLOR;
-        setTimeout(()=>{
-          barOneStyle.backgroundColor=color;
-          barTwoStyle.backgroundColor=color;
-          if(i + 1 === len){
-            this.setState({ arraySorting: false });
-          }
-        },i*this.state.sortingSpeed);
-       }else{
-        setTimeout(()=>{
-          const [barOneIdx,newHeight]=animations[i];
-          const barOneStyle=arrayBars[barOneIdx].style;
-          barOneStyle.height=`${newHeight}px`;
-        },i*this.state.sortingSpeed);
-      }
-    }
-  }
-
-  selectionSort() {
-    this.sortButtonEvent();
-    const animations=getSelectionSortAnimations(this.state.array);
-    for(let i=0;i<animations.length;i++){
-      const arrayBars=document.getElementsByClassName('array-bar');
-      const isColorChange=animations[i][2];
-      if(isColorChange){
-        const[barOneIdx,barTwoIdx]= animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color=i%2===0?SECONDARY_COLOR:BAR_DEFAULT_COLOR;
-        setTimeout(()=>{
-          barOneStyle.backgroundColor=color;
-          barTwoStyle.backgroundColor=color;
-        },i*this.state.sortingSpeed);
-       }else{
-        setTimeout(()=>{
-          const [barOneIdx,newHeight]=animations[i];
-          const barOneStyle=arrayBars[barOneIdx].style;
-          barOneStyle.height=`${newHeight}px`;
-        },i*this.state.sortingSpeed);
-      }
-    }
-  }
-
-  insertionSort() {
-    this.sortButtonEvent();
-    const animations=getInsertionSortAnimations(this.state.array);
-    for (let i = 0, len = animations.length; i < len; i++) {
-      const arrayBars=document.getElementsByClassName('array-bar');
-      const isColorChange=animations[i][2];
-      if(isColorChange){
-        const[barOneIdx,barTwoIdx]= animations[i];
-        const barOneStyle = arrayBars[barOneIdx].style;
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        const color=i%2===0?SECONDARY_COLOR:BAR_DEFAULT_COLOR;
-        setTimeout(()=>{
-          barOneStyle.backgroundColor=color;
-          barTwoStyle.backgroundColor=color;
-        },i*this.state.sortingSpeed);
-       }else{
-        setTimeout(()=>{
-          const [barOneIdx,newHeight]=animations[i];
-          const barOneStyle=arrayBars[barOneIdx].style;
-          barOneStyle.height=`${newHeight}px`;
-          if(i + 1 === len){
-            this.setState({ arraySorting: false });
-          }
-        },i*this.state.sortingSpeed);
-      }
-    }
-  }
-
+  //Function is called whenever slider changes state (new array size is chosen by user)
   updateArrayValue = (event, newValue) => {
+    //newValue may not be new, whenever slider change event is detected - only run if array size value is changed
     if(newValue !== this.state.arraySize){
       this.setState({ arraySize: newValue });
+      //If selected option is random, run reset array; else, create new reverse array
       if(this.state.selectedIndex === 0){
         this.resetArray();
       }
@@ -292,6 +141,12 @@ export default class SortingVisualizer extends React.Component {
     }
   };
 
+  //Changes state of array sorting to false; once sorting is complete, release lock
+  finishedSortingHandler(){
+    this.setState({ arraySorting : false })
+  }
+
+  //When menu item is clicked, either reset array or reverse array
   handleMenuItemClick = (event, index) => {
     this.setState({ selectedIndex: index, anchorEl: null });
     if(index === 0){
@@ -302,18 +157,22 @@ export default class SortingVisualizer extends React.Component {
     }
   };
 
+  //When list item is clicked, set anchor element to new target
   handleClickListItem = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
+  //Closing handler for menu to attach anchor to input
   handleClose = (event, input) => {
     this.setState({ anchorEl: input });
   };
 
+  //Toggle side drawer open or close (accepts boolean)
   toggleDrawer(newValue){
     this.setState( { drawerOpen: newValue } );
   };
 
+  //Get button size based on media query
   getButtonSize(isDesktop){
     if(isDesktop){
       return "large"
@@ -323,16 +182,14 @@ export default class SortingVisualizer extends React.Component {
     }
   }
 
-
-
-
   render() {
-    const {array} = this.state;
+    //Ditto above, (lines 43:49)
     const disabled_sorted = this.state.arraySorted;
     const disabled_sorting = this.state.arraySorting;
     const drawerOpen = this.state.drawerOpen;
     const anchorEl = this.state.anchorEl;
     const selectedIndex = this.state.selectedIndex;
+    //Options for array type
     const options = [
       'Random',
       'Reverse',
@@ -340,19 +197,19 @@ export default class SortingVisualizer extends React.Component {
     
 
     return (
-      <div className="container">
+      <div className="root-container">
         <AppBar position="sticky">
           <Toolbar>
-            <IconButton edge="start" className="sortButton" color="inherit" aria-label="sort" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
+            <IconButton edge="start" className="sort-button" color="inherit" aria-label="sort" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
               <SortIcon />
             </IconButton>
-            <Typography variant="h6" className="grow">
+            <Typography variant="h6" className="top-navbar">
               <Link href="https://sortalgo.com" color="inherit" underline="none">
                 SortAlgo
               </Link>
             </Typography>
             <Link href="https://github.com/brchung/sorting-visualizer" color="inherit">
-              <IconButton edge="end" className="githubButton" color="inherit" aria-label="github">
+              <IconButton edge="end" className="github-button" color="inherit" aria-label="github">
                   <GitHubIcon />
               </IconButton>
             </Link>
@@ -377,7 +234,7 @@ export default class SortingVisualizer extends React.Component {
               max={200}
             />
           </div>
-          <div className="array-type">
+          <div className="array-type-menu">
             <List component="nav" aria-label="array type">
               <ListItem
                 button
@@ -422,18 +279,12 @@ export default class SortingVisualizer extends React.Component {
             </Button>
           </div>
         </div>
-        <div className="array-container">
-          {array.map((value, idx) => (
-            <div
-              className="array-bar"
-              key={idx}
-              style={{
-                backgroundColor: BAR_DEFAULT_COLOR,
-                height: `${value}px`,
-              }}>
-            </div>
-          ))}
-        </div>
+        <ArrayBars
+          ref = {this.arrayBars}
+          arraySize = {this.state.arraySize}
+          sortingSpeed = {this.state.sortingSpeed}
+          arraySortingAction = {this.finishedSortingHandler}
+        />
         <Footer />
         <Drawer anchor='left' open={drawerOpen} onClose={() => {this.toggleDrawer(false)}}>
           <div className="drawer-list">
@@ -443,37 +294,37 @@ export default class SortingVisualizer extends React.Component {
                   Sorting Algorithms
                 </ListSubheader>
               }>
-              <ListItem button onClick={() => this.mergeSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doMergeSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <MergeTypeIcon />
                 </ListItemIcon>
                 <ListItemText primary="Merge Sort" />
               </ListItem>
-              <ListItem button onClick={() => this.quickSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doQuickSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <CallSplitIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quick Sort" />
               </ListItem>
-              <ListItem button onClick={() => this.heapSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doHeapSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <AccountTreeIcon />
                 </ListItemIcon>
                 <ListItemText primary="Heap Sort" />
               </ListItem>
-              <ListItem button onClick={() => this.selectionSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doSelectionSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <SelectAllIcon />
                 </ListItemIcon>
                 <ListItemText primary="Selection Sort" />
               </ListItem>
-              <ListItem button onClick={() => this.insertionSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doInsertionSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <ViewCarouselIcon />
                 </ListItemIcon>
                 <ListItemText primary="Insertion Sort" />
               </ListItem>
-              <ListItem button onClick={() => this.bubbleSort()} disabled={disabled_sorted}>
+              <ListItem button onClick={() => this.doBubbleSort()} disabled={disabled_sorted}>
                 <ListItemIcon>
                   <BubbleChartIcon />
                 </ListItemIcon>
@@ -505,26 +356,4 @@ export default class SortingVisualizer extends React.Component {
       </div>
     );
   }
-}
-
-//Returns a random integer from interval
-function randomIntFromInterval(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-//Returns an array with decreasing value
-function reversePushValues(min, max, arraySize) {
-  const array = [];
-  let pushValue = max;
-  const step = max / arraySize;
-  for (let i = 0; i < arraySize; i++) {
-    array.push(Math.floor(pushValue + min));
-    pushValue = pushValue - step;
-  }
-  return array.slice();
-}
-
-//Returns text as valuetext string
-function valuetext(value) {
-  return `${value}`;
 }
