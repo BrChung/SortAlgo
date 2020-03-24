@@ -1,5 +1,5 @@
 import React from 'react';
-import SortingVisualizer from './SortingVisualizer/SortingVisualizer';
+import SortAlgo from './SortAlgo/SortAlgo';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { ThemeProvider } from '@material-ui/core/styles';
 import './App.css';
@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="App">
       <ThemeProvider theme = {theme}>
-        <SortingVisualizer isDesktop={isDesktop}></SortingVisualizer>
+        <SortAlgo isDesktop={isDesktop}></SortAlgo>
       </ThemeProvider>
     </div>
   );

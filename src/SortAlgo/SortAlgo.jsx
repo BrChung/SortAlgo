@@ -33,14 +33,14 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 //Components
 import Footer from './Components/Footer';
 import ArrayBars from './Components/ArrayBars';
-import './SortingVisualizer.css';
+import './SortAlgo.css';
 
 //Returns text as valuetext string
 function valuetext(value) {
   return `${value}`;
 }
 
-export default class SortingVisualizer extends React.Component {
+export default class SortAlgo extends React.Component {
   constructor(props) {
     super(props);
 
