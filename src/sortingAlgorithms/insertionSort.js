@@ -4,7 +4,6 @@ export function getInsertionSortAnimations(array){
   if(array.length<=1)return array;
   const auxiliaryArray=array.slice();
   doInsertionSort(auxiliaryArray,animations);
-  console.log(auxiliaryArray);
   return animations;
 }
 

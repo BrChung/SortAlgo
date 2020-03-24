@@ -7,7 +7,6 @@ export function getHeapSortAnimations(array){
   animations = []
   const auxiliaryArray=array.slice();
   doHeapSort(auxiliaryArray);
-  console.log(auxiliaryArray);
   return animations;
 }
 

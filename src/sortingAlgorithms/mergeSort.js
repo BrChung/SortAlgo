@@ -4,7 +4,6 @@ export function getMergeSortAnimations(array) {
   if (array.length <= 1) return array;
   const auxiliaryArray = array.slice();
   mergeSortHelper(array, 0, array.length - 1, auxiliaryArray, animations);
-  console.log(array);
   return animations;
 }
 

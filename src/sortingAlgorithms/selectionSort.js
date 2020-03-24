@@ -4,7 +4,6 @@ export function getSelectionSortAnimations(array){
   if(array.length<=1)return array;
   const auxiliaryArray=array.slice();
   doSelectionSort(auxiliaryArray,animations);
-  console.log(auxiliaryArray);
   return animations;
 }
 

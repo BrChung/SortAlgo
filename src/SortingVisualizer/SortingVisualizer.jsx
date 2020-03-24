@@ -351,9 +351,11 @@ export default class SortingVisualizer extends React.Component {
                 SortAlgo
               </Link>
             </Typography>
-            <IconButton edge="end" className="moreButton" color="inherit" aria-label="more" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
-              <GitHubIcon />
-            </IconButton>
+            <Link href="https://github.com/brchung/sorting-visualizer" color="inherit">
+              <IconButton edge="end" className="githubButton" color="inherit" aria-label="github">
+                  <GitHubIcon />
+              </IconButton>
+            </Link>
           </Toolbar>
         </AppBar>
         <div className="prop-container">

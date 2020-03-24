@@ -4,7 +4,6 @@ export function getQuickSortAnimations(array) {
   if (array.length <= 1) return array;
   const auxiliaryArray = array.slice();
   doQuickSort(auxiliaryArray, 0, array.length - 1, animations);
-  console.log(auxiliaryArray);
   return animations;
 }
 
