@@ -1,10 +1,11 @@
 {
-  "name": "sorting-visualizer",
+  "name": "SortAlgo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.9.7",
     "@material-ui/icons": "^4.9.1",
+    "@primer/octicons-react": "^9.6.0",
     "material-ui-icons": "^1.0.0-beta.36",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

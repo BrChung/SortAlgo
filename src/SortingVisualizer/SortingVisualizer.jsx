@@ -69,7 +69,7 @@ export default class SortingVisualizer extends React.Component {
   
   //Reset the array to random values
   resetArray = () => {
-    this.arrayBars.current.resetArray();
+    this.arrayBars.current.randomArray();
     const arraySize = this.state.arraySize;
     const speed = (-4 / 150) * (arraySize-50) + 5;
     this.setState({ arraySorted: false, sortingSpeed: speed, selectedIndex: 0 });
@@ -203,12 +203,12 @@ export default class SortingVisualizer extends React.Component {
             <IconButton edge="start" className="sort-button" color="inherit" aria-label="sort" onClick={() => {this.toggleDrawer(true)}} disabled={disabled_sorting}>
               <SortIcon />
             </IconButton>
-            <Typography variant="h6" className="top-navbar">
+            <Typography variant="h6" className="top-navbar" color="inherit">
               <Link href="https://sortalgo.com" color="inherit" underline="none">
                 SortAlgo
               </Link>
             </Typography>
-            <Link href="https://github.com/brchung/sorting-visualizer" color="inherit">
+            <Link href="https://github.com/brchung/SortAlgo" color="inherit">
               <IconButton edge="end" className="github-button" color="inherit" aria-label="github">
                   <GitHubIcon />
               </IconButton>

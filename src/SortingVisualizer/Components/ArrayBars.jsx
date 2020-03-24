@@ -1,17 +1,20 @@
 import React from 'react';
+
 import {getMergeSortAnimations} from '../../sortingAlgorithms/mergeSort';
 import {getQuickSortAnimations} from '../../sortingAlgorithms/quickSort';
 import {getHeapSortAnimations} from '../../sortingAlgorithms/heapSort';
 import {getBubbleSortAnimations} from '../../sortingAlgorithms/bubbleSort';
 import {getSelectionSortAnimations} from '../../sortingAlgorithms/selectionSort';
 import {getInsertionSortAnimations} from '../../sortingAlgorithms/insertionSort';
+
 import './ArrayBars.css';
 
+
 // This is the main color of the array bars.
-const BAR_DEFAULT_COLOR = 'lightblue';
+const BAR_DEFAULT_COLOR = '#043565';
 
 // This is the color of array bars that are being compared throughout the animations.
-const SECONDARY_COLOR = 'red';
+const SECONDARY_COLOR = '#A69CAC';
 
 export default class ArrayBars extends React.Component {
     constructor(props) {
@@ -24,14 +27,14 @@ export default class ArrayBars extends React.Component {
     }
 
     componentDidMount() {
-        this.resetArray();
+        this.randomArray();
     }
 
-    resetArray() {
+    randomArray() {
         const array = [];
         const arraySize = this.props.arraySize;
         for (let i = 0; i < arraySize; i++) {
-            array.push(randomIntFromInterval(5, 500));
+            array.push(randomInt(5, 500));
         }
         this.setState({ array });
     }
@@ -228,7 +231,7 @@ export default class ArrayBars extends React.Component {
 }
 
 //Returns a random integer from interval
-function randomIntFromInterval(min, max) {
+function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
   
